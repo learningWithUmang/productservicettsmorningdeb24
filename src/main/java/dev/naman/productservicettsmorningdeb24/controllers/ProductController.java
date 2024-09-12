@@ -2,6 +2,7 @@ package dev.naman.productservicettsmorningdeb24.controllers;
 
 import dev.naman.productservicettsmorningdeb24.dtos.CreateProductRequestDto;
 import dev.naman.productservicettsmorningdeb24.dtos.ErrorDto;
+import dev.naman.productservicettsmorningdeb24.dtos.UserDTO;
 import dev.naman.productservicettsmorningdeb24.exceptions.ProductNotFoundException;
 import dev.naman.productservicettsmorningdeb24.models.Product;
 import dev.naman.productservicettsmorningdeb24.services.FakeStoreProductService;
@@ -27,7 +28,7 @@ public class ProductController {
 //    private ProductService productService2 = new FakeStoreProductService();
 
 
-    public ProductController(@Qualifier("fakeStoreProductService") ProductService productService,
+    public ProductController(@Qualifier("selfProductService") ProductService productService,
                              RestTemplate restTemplate
     ) {
         this.productService = productService;
@@ -69,19 +70,26 @@ public class ProductController {
     @GetMapping("/products")
     public ResponseEntity<List<Product>> getAllProducts() throws ProductNotFoundException {
 
-        List<Product> products = productService.getProducts();
+        //I want to call user service
+        ////Client side load balancing
+        UserDTO userDTO = restTemplate.getForObject("http://userservice/users/2",
+                UserDTO.class);
+        //we have the user from the user service
 
-        List<Product> productListSample = new ArrayList<>();
-        Product extraProd = new Product();
-        extraProd.setPrice(100);
-        extraProd.setTitle("pen");
-        extraProd.setDescription("utility");
 
-        productListSample.add(extraProd);
+        List<Product> products = new ArrayList<>();
+
+//        List<Product> productListSample = new ArrayList<>();
+//        Product extraProd = new Product();
+//        extraProd.setPrice(100);
+//        extraProd.setTitle("pen");
+//        extraProd.setDescription("utility");
+//
+//        productListSample.add(extraProd);
 
 //        throw new ProductNotFoundException("Bla bla bla");
 
-        ResponseEntity<List<Product>> response = new ResponseEntity<>(productListSample, HttpStatus.OK);
+        ResponseEntity<List<Product>> response = new ResponseEntity<>(products, HttpStatus.OK);
         return response;
     }
 
